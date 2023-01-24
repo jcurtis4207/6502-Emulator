@@ -1,0 +1,13 @@
+# ignore all binary files from compiler
+*.bin
+
+# ignore all output files from assembler
+*.out
+*.lst
+
+# ignore 3rd party assembler and vscode stuff
+dasm/
+.vscode
+
+hexfile.txt
+*.asm
