@@ -375,10 +375,9 @@ void PHP() {
 }
 
 void PLP() {
-    // B and unused bits are left unchanged
-    Byte fromStackWithMaskCleared = popByteFromStack() & ~(unusedBit | breakBit);
-    Byte maskFromRegister = registers.PS & (unusedBit | breakBit);
-    registers.PS = maskFromRegister | fromStackWithMaskCleared;
+    registers.PS = popByteFromStack();
+    registers.flags.B = 0;
+    registers.flags.unused = 0;
 }
 
 
@@ -549,14 +548,14 @@ void BRK() {
     // B & unused are set in memory
     pushByteToStack(registers.PS | unusedBit | breakBit);
     registers.flags.B = 1;
+    registers.flags.I = 1;
     registers.PC = readMemory(0xFFFE) | (readMemory(0xFFFF) << 8);
 }
 
 void RTI() {
-    // B and unused bits are left unchanged
-    Byte fromStackWithMaskCleared = popByteFromStack() & ~(unusedBit | breakBit);
-    Byte maskFromRegister = registers.PS & (unusedBit | breakBit);
-    registers.PS = maskFromRegister | fromStackWithMaskCleared;
+    registers.PS = popByteFromStack();
+    registers.flags.B = 0;
+    registers.flags.unused = 0;
     popPCfromStack();
 }
 

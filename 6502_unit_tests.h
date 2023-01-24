@@ -1882,35 +1882,24 @@ void unitTestPHP() {
 }
 
 void unitTestPLP() {
+    Byte bAndUCleared = ~(unusedBit | breakBit);
     // Zeros
     registers.SP = 0x15;
     writeMemory(0x0116, 0x00);
     PLP();
     assert(registers.PS == 0x00);
     clearRegisters();
-    // Ones - unchanged register bits cleared
+    // Ones - B&U are cleared
     registers.SP = 0x15;
-    registers.flags.B = 0;
-    registers.flags.unused = 0;
     writeMemory(0x0116, 0xFF);
     PLP();
-    assert(registers.PS == 0b11001111);
+    assert(registers.PS == (0xFF & bAndUCleared));
     clearRegisters();
-    // Ones - unchanged register bits set
-    registers.SP = 0x15;
-    registers.flags.B = 1;
-    registers.flags.unused = 1;
-    writeMemory(0x0116, 0xFF);
-    PLP();
-    assert(registers.PS == 0b11111111);
-    clearRegisters();
-    // Alternating - unchanged register bits set
-    registers.flags.B = 1;
-    registers.flags.unused = 1;
+    // Alternating - B&U are cleared
     registers.SP = 0x15;
     writeMemory(0x0116, 0xAA);
     PLP();
-    assert(registers.PS == (0xAA | unusedBit | breakBit));
+    assert(registers.PS == (0xAA & bAndUCleared));
     clearRegisters();
     printf("All PLP unit tests passed\n");
 }
@@ -2527,6 +2516,7 @@ void unitTestBRK() {
     assert(readMemory(0x0153) == (overflowBit | carryBit | breakBit | unusedBit));
     assert(registers.PC == 0x6789);
     assert(registers.flags.B == 1);
+    assert(registers.flags.I == 1);
     clearRegisters();
     printf("All JSR unit tests passed\n");  
 }
@@ -2544,16 +2534,13 @@ void unitTestRTI() {
     clearRegisters();
     // unchanged register bits set
     registers.SP = 0x52;
-    registers.flags.B = 1;
-    registers.flags.unused = 1;
     writeMemory(0x0153, carryBit);
     writeMemory(0x0154, 0x78);
     writeMemory(0x0155, 0x56);
     RTI();
     assert(registers.PC == 0x5678);
     assert(registers.flags.C == 1);
-    assert(registers.flags.B == 1);
-    assert(registers.flags.unused == 1);
+    assert(registers.flags.B == 0);
     clearRegisters();
     printf("All RTI unit tests passed\n");  
 }
@@ -2583,7 +2570,7 @@ void unitTestBRKandRTI() {
     assert(registers.PC == 0x3456);
     assert(registers.flags.C == 1);
     assert(registers.flags.V == 1);
-    assert(registers.flags.B == 1);
+    assert(registers.flags.B == 0);
     clearRegisters();
     printf("BRK and RTI unit test passed\n");  
 }
