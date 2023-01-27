@@ -313,7 +313,12 @@ void BIT(Byte addressMode) {
 void executeJump(Byte indirect) {
     if (indirect) {
         Word address = getAbsoluteAddress();
-        registers.PC = readMemory(address) | (readMemory(address + 1) << 8);
+        if ((Byte)address == 0xFF) {
+            Word addressHi = address & 0xFF00;
+            registers.PC = readMemory(address) | (readMemory(addressHi) << 8);
+        } else {
+            registers.PC = readMemory(address) | (readMemory(address + 1) << 8);
+        }
     } else {
         registers.PC = getAbsoluteAddress();
     }
@@ -549,12 +554,16 @@ void BPL() {
 /* Subroutines */
 void JSR() {
     Word jumpAddress = getAbsoluteAddress();
+    // PC-1 is pushed onto the stack
+    registers.PC--;
     pushPCtoStack();
     registers.PC = jumpAddress;
 }
 
 void RTS() {
+    // PC-1 was pushed, so popped PC must be incremented
     popPCfromStack();
+    registers.PC++;
 }
 
 void BRK() {

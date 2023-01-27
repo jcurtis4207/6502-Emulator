@@ -1593,6 +1593,15 @@ void unitTestJMP() {
     writeMemory(0x045C, 0x12);
     JMP(0b011);
     assert(registers.PC == 0x1234);
+    // Page cross bug: JMP (0x04FF) = JMP
+    registers.PC = 0x300;
+    writeMemory(0x300, 0xFF);
+    writeMemory(0x301, 0x04);
+    writeMemory(0x0400, 0x56);
+    writeMemory(0x04FF, 0x34);
+    writeMemory(0x0500, 0x12);
+    JMP(0b011);
+    assert(registers.PC == 0x5634);
     printf("All JMP unit tests passed\n");
 }
 
@@ -2448,7 +2457,7 @@ void unitTestBPL() {
 /* Subroutines */
 void unitTestJSR() {
     // JSR 0x1234
-    // Address 0x0306 -> Stack 0x0155,0x0154
+    // Address 0x0306 -1 -> Stack 0x0155,0x0154
     registers.PC = 0x304;
     registers.SP = 0x55;
     writeMemory(0x304, 0x34);
@@ -2456,18 +2465,18 @@ void unitTestJSR() {
     JSR();
     assert(registers.PC == 0x1234);
     assert(readMemory(0x0155) == 0x03);
-    assert(readMemory(0x0154) == 0x06);
+    assert(readMemory(0x0154) == 0x05);
     clearRegisters();
     printf("All JSR unit tests passed\n");  
 }
 
 void unitTestRTS() {
-    // 0x0306 pushed on stack at 0x0155,0x0154
+    // 0x0306 pushed on stack at 0x0155,0x0154 -> RTS increments PC
     writeMemory(0x0155, 0x03);
     writeMemory(0x0154, 0x06);
     registers.SP = 0x53;
     RTS();
-    assert(registers.PC == 0x0306);
+    assert(registers.PC == 0x0307);
     clearRegisters();
     printf("All RTS unit tests passed\n");  
 }
