@@ -77,7 +77,9 @@ Word getZeroPageAddress() {
 }
 
 Word getZeroIndexedAddress(Byte index) {
-    return (0 << 8) | (fetchInstruction() + index);
+    // Must truncate lower Byte because indexed
+    // zero page address wraps inside zero page
+    return (0 << 8) | (Byte)(fetchInstruction() + index);
 }
 
 Word getIndexedIndirectAddress(Byte index) {

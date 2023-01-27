@@ -88,6 +88,16 @@ void unitTestLDA() {
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
     clearRegisters();
+    // Zero,X Wrap: LDA $(FF +2) = $(0x01) = 0x34
+    registers.PC = 0x300;
+    registers.X = 0x02;
+    writeMemory(0x300, 0xFF);
+    writeMemory(0x01, 0x34);
+    LDA(0b101);
+    assert(registers.A == 0x34);
+    assert(registers.flags.Z == 0);
+    assert(registers.flags.N == 0);
+    clearRegisters();
     // (Zero,X): LDA ($20,4) = LDA $2047 = 0x77
     registers.PC = 0x300;
     registers.X = 0x04;
@@ -996,6 +1006,16 @@ void unitTestLDX() {
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
     clearRegisters();
+    // Zero,Y Wrap: LDX $(FF +2) = $(01) = 0x34
+    registers.PC = 0x300;
+    registers.Y = 0x02;
+    writeMemory(0x300, 0xFF);
+    writeMemory(0x01, 0x34);
+    LDX(0b101);
+    assert(registers.X == 0x34);
+    assert(registers.flags.Z == 0);
+    assert(registers.flags.N == 0);
+    clearRegisters();
     printf("All LDX unit tests passed\n");
 }
 
@@ -1692,6 +1712,16 @@ void unitTestLDY() {
     registers.X = 0x02;
     writeMemory(0x300, 0x08);
     writeMemory(0x0A, 0x34);
+    LDY(0b101);
+    assert(registers.Y == 0x34);
+    assert(registers.flags.Z == 0);
+    assert(registers.flags.N == 0);
+    clearRegisters();
+    // Zero,X Wrap: LDY $(FF +2) = $(01) = 0x34
+    registers.PC = 0x300;
+    registers.X = 0x02;
+    writeMemory(0x300, 0xFF);
+    writeMemory(0x01, 0x34);
     LDY(0b101);
     assert(registers.Y == 0x34);
     assert(registers.flags.Z == 0);
