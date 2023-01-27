@@ -2512,7 +2512,7 @@ void unitTestBRK() {
     writeMemory(0xFFFF, 0x67);
     BRK();
     assert(readMemory(0x0155) == 0x34);
-    assert(readMemory(0x0154) == 0x56);
+    assert(readMemory(0x0154) == 0x57); // PC+1 used for return address
     assert(readMemory(0x0153) == (overflowBit | carryBit | breakBit | unusedBit));
     assert(registers.PC == 0x6789);
     assert(registers.flags.B == 1);
@@ -2555,7 +2555,7 @@ void unitTestBRKandRTI() {
     writeMemory(0xFFFF, 0x67);
     BRK();
     assert(readMemory(0x0155) == 0x34);
-    assert(readMemory(0x0154) == 0x56);
+    assert(readMemory(0x0154) == 0x57); // PC+1 used for return address
     assert(readMemory(0x0153) == (overflowBit | carryBit | breakBit | unusedBit));
     assert(registers.PC == 0x6789);
     assert(registers.flags.B == 1);
@@ -2565,9 +2565,9 @@ void unitTestBRKandRTI() {
     writeMemory(0x3312, 0xDE);
     LDA(0b011);
     assert(registers.A == 0xDE);
-    // RTI to 0x3456 with Carry and Overflow set (break left set)
+    // RTI to 0x3457 with Carry and Overflow set (break left set)
     RTI();
-    assert(registers.PC == 0x3456);
+    assert(registers.PC == 0x3457);
     assert(registers.flags.C == 1);
     assert(registers.flags.V == 1);
     assert(registers.flags.B == 0);

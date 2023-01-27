@@ -544,6 +544,9 @@ void RTS() {
 }
 
 void BRK() {
+    // https://www.c64-wiki.com/wiki/BRK
+    // PC+1 is pushed onto the stack
+    registers.PC++;
     pushPCtoStack();
     // B & unused are set in memory
     pushByteToStack(registers.PS | unusedBit | breakBit);
