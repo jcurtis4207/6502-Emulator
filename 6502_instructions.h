@@ -142,9 +142,33 @@ Byte getGroupTwoThreeOperand(Byte addressMode, Byte index) {
             operand = getAbsoluteIndexedValue(index);
             break;
         default:
-            throwError("Invalid Group 2 addressing mode");
+            throwError("Invalid Group 2/3 addressing mode");
     }
     return operand;
+}
+
+Word getGroupTwoThreeAddress(Byte addressMode, Byte index) {
+    Word address = 0;
+    switch(addressMode) {
+        case 0b000: // immediate
+            address = fetchInstruction();
+            break;
+        case 0b001: // zero
+            address = getZeroPageAddress();
+            break;
+        case 0b011: // absolute
+            address = getAbsoluteAddress();
+            break;
+        case 0b101: // zero,X
+            address = getZeroIndexedAddress(index);
+            break;
+        case 0b111: // absolute,X : absolute,Y for LDX
+            address = getAbsoluteIndexedAddress(index);
+            break;
+        default:
+            throwError("Invalid Group 2/3 addressing mode");
+    }
+    return address; 
 }
 
 void LDX(Byte addressMode) {
@@ -160,82 +184,96 @@ void ASL(Byte addressMode) {
     if (addressMode == 0b000) {
         throwError("Invalid address mode for ASL");
     }
-    Byte operand = getGroupTwoThreeOperand(addressMode, registers.X);
-    registers.A = (Byte)(operand << 1);
-    registers.flags.C = operand >= 0x80;
-    registers.flags.Z = registers.A == 0;
-    registers.flags.N = (registers.A & negativeBit) > 0;
+    if (addressMode == 0b010) {
+        registers.flags.C = registers.A >= 0x80;
+        registers.A = (Byte)(registers.A << 1);
+        registers.flags.Z = registers.A == 0;
+        registers.flags.N = (registers.A & negativeBit) > 0;
+    } else {
+        Word address = getGroupTwoThreeAddress(addressMode, registers.X);
+        Byte operand = readMemory(address);
+        registers.flags.C = operand >= 0x80;
+        operand = (Byte)(operand << 1);
+        registers.flags.Z = operand == 0;
+        registers.flags.N = (operand & negativeBit) > 0;
+        writeMemory(address, operand);
+    }
 }
 
 void LSR(Byte addressMode) {
     if (addressMode == 0b000) {
         throwError("Invalid address mode for LSR");
     }
-    Byte operand = getGroupTwoThreeOperand(addressMode, registers.X);
-    registers.A = operand >> 1;
-    registers.flags.C = operand & 0x01;
-    registers.flags.Z = registers.A == 0;
-    registers.flags.N = (registers.A & negativeBit) > 0;
+    if (addressMode == 0b010) {
+        registers.flags.C = registers.A & 0x01;
+        registers.A = registers.A >> 1;
+        registers.flags.Z = registers.A == 0;
+        registers.flags.N = (registers.A & negativeBit) > 0;
+    } else {
+        Word address = getGroupTwoThreeAddress(addressMode, registers.X);
+        Byte operand = readMemory(address);
+        registers.flags.C = operand & 0x01;
+        operand = operand >> 1;
+        registers.flags.Z = operand == 0;
+        registers.flags.N = (operand & negativeBit) > 0;
+        writeMemory(address, operand);
+    }
 }
 
 void ROL(Byte addressMode) {
     if (addressMode == 0b000) {
         throwError("Invalid address mode for ROL");
     }
-    Byte operand = getGroupTwoThreeOperand(addressMode, registers.X);
-    registers.A = (Byte)((operand << 1) | registers.flags.C);
-    registers.flags.C = operand >= 0x80;
-    registers.flags.Z = registers.A == 0;
-    registers.flags.N = (registers.A & negativeBit) > 0;
+    if (addressMode == 0b010) {
+        Byte operand = registers.A;
+        registers.A = (Byte)((operand << 1) | registers.flags.C);
+        registers.flags.C = operand >= 0x80;
+        registers.flags.Z = registers.A == 0;
+        registers.flags.N = (registers.A & negativeBit) > 0;
+    } else {
+        Word address = getGroupTwoThreeAddress(addressMode, registers.X);
+        Byte operand = readMemory(address);
+        Byte newOperand = (Byte)((operand << 1) | registers.flags.C);
+        registers.flags.C = operand >= 0x80;
+        registers.flags.Z = newOperand == 0;
+        registers.flags.N = (newOperand & negativeBit) > 0;  
+        writeMemory(address, newOperand);
+    }
 }
 
 void ROR(Byte addressMode) {
     if (addressMode == 0b000) {
         throwError("Invalid address mode for ROR");
     }
-    Byte operand = getGroupTwoThreeOperand(addressMode, registers.X);
-    registers.A = (operand >> 1) | (registers.flags.C << 7);
-    registers.flags.C = operand & 0x01;
-    registers.flags.Z = registers.A == 0;
-    registers.flags.N = (registers.A & negativeBit) > 0;
+    if (addressMode == 0b010) {
+        Byte operand = registers.A;
+        registers.A = (operand >> 1) | (registers.flags.C << 7);
+        registers.flags.C = operand & 0x01;
+        registers.flags.Z = registers.A == 0;
+        registers.flags.N = (registers.A & negativeBit) > 0;
+    } else {
+        Word address = getGroupTwoThreeAddress(addressMode, registers.X);
+        Byte operand = readMemory(address);
+        Byte newOperand = (operand >> 1) | (registers.flags.C << 7);
+        registers.flags.C = operand & 0x01;
+        registers.flags.Z = newOperand == 0;
+        registers.flags.N = (newOperand & negativeBit) > 0;  
+        writeMemory(address, newOperand);
+    }
 }
 
 void STX(Byte addressMode) {
-    Word address = 0;
-    switch(addressMode) {
-        case 0b001: // zero
-            address = getZeroPageAddress();
-            break;
-        case 0b011: // absolute
-            address = getAbsoluteAddress();
-            break;
-        case 0b101: // zero,Y
-            address = getZeroIndexedAddress(registers.Y);
-            break;
-        default:
-            throwError("Invalid addressing mode for STX");
+    if (addressMode == 0b000 || addressMode == 0b111) {
+        throwError("Invalid addressing mode for STX");
     }
-    writeMemory(address, registers.X);
+    writeMemory(getGroupTwoThreeAddress(addressMode, registers.Y), registers.X);
 }
 
 void INC(Byte addressMode) {
-    Word address = 0;
-    switch(addressMode) {
-        case 0b001: // zero
-            address = getZeroPageAddress();
-            break;
-        case 0b011: // absolute
-            address = getAbsoluteAddress();
-            break;
-        case 0b101: // zero,X
-            address = getZeroIndexedAddress(registers.X);
-            break;
-        case 0b111: // absolute,X
-            address = getAbsoluteIndexedAddress(registers.X);
-            break;
-        default:
-            throwError("Invalid addressing mode for INC");
+    if (addressMode == 0b000 ) {
+        throwError("Invalid addressing mode for INC");
     }
+    Word address = getGroupTwoThreeAddress(addressMode, registers.X);
     Byte value = (Byte)(readMemory(address) + 1);
     writeMemory(address, value);
     registers.flags.Z = value == 0;
@@ -243,23 +281,10 @@ void INC(Byte addressMode) {
 }
 
 void DEC(Byte addressMode) {
-    Word address = 0;
-    switch(addressMode) {
-        case 0b001: // zero
-            address = getZeroPageAddress();
-            break;
-        case 0b011: // absolute
-            address = getAbsoluteAddress();
-            break;
-        case 0b101: // zero,X
-            address = getZeroIndexedAddress(registers.X);
-            break;
-        case 0b111: // absolute,X
-            address = getAbsoluteIndexedAddress(registers.X);
-            break;
-        default:
-            throwError("Invalid addressing mode for DEC");
+    if (addressMode == 0b000 ) {
+        throwError("Invalid addressing mode for DEC");
     }
+    Word address = getGroupTwoThreeAddress(addressMode, registers.X);
     Byte value = (Byte)(readMemory(address) - 1);
     writeMemory(address, value);
     registers.flags.Z = value == 0;
@@ -309,21 +334,10 @@ void JMP_ABS(Byte addressMode) {
 }
 
 void STY(Byte addressMode) {
-    Word address = 0;
-    switch(addressMode) {
-        case 0b001: // zero
-            address = getZeroPageAddress();
-            break;
-        case 0b011: // absolute
-            address = getAbsoluteAddress();
-            break;
-        case 0b101: // zero,X
-            address = getZeroIndexedAddress(registers.X);
-            break;
-        default:
-            throwError("Invalid addressing mode for STY");
+    if (addressMode == 0b000 || addressMode == 0b111) {
+        throwError("Invalid addressing mode for STY");
     }
-    writeMemory(address, registers.Y);
+    writeMemory(getGroupTwoThreeAddress(addressMode, registers.X), registers.Y);
 }
 
 void LDY(Byte addressMode) {

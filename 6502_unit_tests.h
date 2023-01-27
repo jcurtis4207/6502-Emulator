@@ -1006,7 +1006,7 @@ void unitTestASL() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x33);
     ASL(0b011);
-    assert(registers.A == 0x66);
+    assert(readMemory(0x045B) == 0x66);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1017,7 +1017,7 @@ void unitTestASL() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x88);
     ASL(0b011);
-    assert(registers.A == 0x10);
+    assert(readMemory(0x045B) == 0x10);
     assert(registers.flags.C == 1);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1028,7 +1028,7 @@ void unitTestASL() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x80);
     ASL(0b011);
-    assert(registers.A == 0x00);
+    assert(readMemory(0x045B) == 0x00);
     assert(registers.flags.C == 1);
     assert(registers.flags.Z == 1);
     assert(registers.flags.N == 0);
@@ -1039,7 +1039,7 @@ void unitTestASL() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x42);
     ASL(0b011);
-    assert(registers.A == 0x84);
+    assert(readMemory(0x045B) == 0x84);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 1);
@@ -1060,7 +1060,7 @@ void unitTestASL() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045D, 0x44);
     ASL(0b111);
-    assert(registers.A == 0x88);
+    assert(readMemory(0x045D) == 0x88);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 1);
@@ -1070,7 +1070,7 @@ void unitTestASL() {
     writeMemory(0x300, 0x08);
     writeMemory(0x08, 0x11);
     ASL(0b001);
-    assert(registers.A == 0x22);
+    assert(readMemory(0x08) == 0x22);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1081,7 +1081,7 @@ void unitTestASL() {
     writeMemory(0x300, 0x08);
     writeMemory(0x0A, 0x34);
     ASL(0b101);
-    assert(registers.A == 0x68);
+    assert(readMemory(0x0A) == 0x68);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1096,7 +1096,7 @@ void unitTestLSR() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x66);
     LSR(0b011);
-    assert(registers.A == 0x33);
+    assert(readMemory(0x045B) == 0x33);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1107,7 +1107,7 @@ void unitTestLSR() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x99);
     LSR(0b011);
-    assert(registers.A == 0x4C);
+    assert(readMemory(0x045B) == 0x4C);
     assert(registers.flags.C == 1);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1118,7 +1118,7 @@ void unitTestLSR() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x01);
     LSR(0b011);
-    assert(registers.A == 0x00);
+    assert(readMemory(0x045B) == 0x00);
     assert(registers.flags.C == 1);
     assert(registers.flags.Z == 1);
     assert(registers.flags.N == 0);
@@ -1139,7 +1139,7 @@ void unitTestLSR() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045D, 0x44);
     LSR(0b111);
-    assert(registers.A == 0x22);
+    assert(readMemory(0x045D) == 0x22);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1149,7 +1149,7 @@ void unitTestLSR() {
     writeMemory(0x300, 0x08);
     writeMemory(0x08, 0x78);
     LSR(0b001);
-    assert(registers.A == 0x3C);
+    assert(readMemory(0x08) == 0x3C);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1160,7 +1160,7 @@ void unitTestLSR() {
     writeMemory(0x300, 0x08);
     writeMemory(0x0A, 0x34);
     LSR(0b101);
-    assert(registers.A == 0x1A);
+    assert(readMemory(0x0A) == 0x1A);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1176,7 +1176,7 @@ void unitTestROL() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x33);
     ROL(0b011);
-    assert(registers.A == 0x67);
+    assert(readMemory(0x045B) == 0x67);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1187,7 +1187,7 @@ void unitTestROL() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x88);
     ROL(0b011);
-    assert(registers.A == 0x10);
+    assert(readMemory(0x045B) == 0x10);
     assert(registers.flags.C == 1);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1198,7 +1198,7 @@ void unitTestROL() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x80);
     ROL(0b011);
-    assert(registers.A == 0x00);
+    assert(readMemory(0x045B) == 0x00);
     assert(registers.flags.C == 1);
     assert(registers.flags.Z == 1);
     assert(registers.flags.N == 0);
@@ -1209,7 +1209,7 @@ void unitTestROL() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x42);
     ROL(0b011);
-    assert(registers.A == 0x84);
+    assert(readMemory(0x045B) == 0x84);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 1);
@@ -1230,7 +1230,7 @@ void unitTestROL() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045D, 0x44);
     ROL(0b111);
-    assert(registers.A == 0x88);
+    assert(readMemory(0x045D) == 0x88);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 1);
@@ -1241,7 +1241,7 @@ void unitTestROL() {
     writeMemory(0x300, 0x08);
     writeMemory(0x08, 0x11);
     ROL(0b001);
-    assert(registers.A == 0x23);
+    assert(readMemory(0x08) == 0x23);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1252,7 +1252,7 @@ void unitTestROL() {
     writeMemory(0x300, 0x08);
     writeMemory(0x0A, 0x34);
     ROL(0b101);
-    assert(registers.A == 0x68);
+    assert(readMemory(0x0A) == 0x68);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1267,7 +1267,7 @@ void unitTestROR() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x66);
     ROR(0b011);
-    assert(registers.A == 0x33);
+    assert(readMemory(0x045B) == 0x33);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1278,7 +1278,7 @@ void unitTestROR() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x99);
     ROR(0b011);
-    assert(registers.A == 0x4C);
+    assert(readMemory(0x045B) == 0x4C);
     assert(registers.flags.C == 1);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1290,7 +1290,7 @@ void unitTestROR() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x66);
     ROR(0b011);
-    assert(registers.A == 0xB3);
+    assert(readMemory(0x045B) == 0xB3);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 1);
@@ -1301,7 +1301,7 @@ void unitTestROR() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045B, 0x01);
     ROR(0b011);
-    assert(registers.A == 0x00);
+    assert(readMemory(0x045B) == 0x00);
     assert(registers.flags.C == 1);
     assert(registers.flags.Z == 1);
     assert(registers.flags.N == 0);
@@ -1322,7 +1322,7 @@ void unitTestROR() {
     writeMemory(0x301, 0x04);
     writeMemory(0x045D, 0x44);
     ROR(0b111);
-    assert(registers.A == 0x22);
+    assert(readMemory(0x045D) == 0x22);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1332,7 +1332,7 @@ void unitTestROR() {
     writeMemory(0x300, 0x08);
     writeMemory(0x08, 0x78);
     ROR(0b001);
-    assert(registers.A == 0x3C);
+    assert(readMemory(0x08) == 0x3C);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 0);
@@ -1344,7 +1344,7 @@ void unitTestROR() {
     writeMemory(0x300, 0x08);
     writeMemory(0x0A, 0x34);
     ROR(0b101);
-    assert(registers.A == 0x9A);
+    assert(readMemory(0x0A) == 0x9A);
     assert(registers.flags.C == 0);
     assert(registers.flags.Z == 0);
     assert(registers.flags.N == 1);
