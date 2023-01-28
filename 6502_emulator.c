@@ -18,8 +18,8 @@
     -- Online assembler --
     https://www.masswerk.at/6502/assembler.html
 
-    -- Python assmbler --
-    https://github.com/SYSPROG-JLS/6502Asm
+    -- Functional tests --
+    https://github.com/Klaus2m5/6502_65C02_functional_tests
 
     -- Assembly examples --
     https://skilldrick.github.io/easy6502/
